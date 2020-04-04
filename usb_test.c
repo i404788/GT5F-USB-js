@@ -31,14 +31,15 @@ int main(int argc, char const *argv[])
   printf("sense: %s ; dxfer: %s ; stat: %d\n", cIOBuffer, "<OUTGOING>", rawcmd.status);
   */
   int status = Run_Command(fd, 0x01, 0x00);
-  if (status < 0){
+  if (status < 0)
+  {
     printf("Failed to send message 1: %d\n", status);
   }
   status = Run_Command(fd, 0x12, 0x00);
-  if (status < 0){
+  if (status < 0)
+  {
     printf("Failed to send message 2: %d\n", status);
   }
-  
 
   return 0;
 }
