@@ -1,0 +1,12 @@
+{
+    "name": "gt-usb",
+    "version": "0.1.1",
+    "gypfile": true,
+    "scripts": {
+        "start": "node index.js"
+    },
+    "main": "index.js",
+    "dependencies": {
+        "nan": "^2.11.1"
+    }
+}
