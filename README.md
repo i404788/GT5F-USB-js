@@ -6,6 +6,8 @@ It probably also doesn't work on Windows (MinGW), but it could be ported.
 
 It can be installed with `yarn add gt-usb` or `npm install gt-usb`.
 
+Note that due to the usage of Generic SCSI GT-* over USB always requires `CAP_SYS_RAWIO` (e.g. `setcap cap_sys_rawio=ep a.out ` or root)
+
 ## Features
 * Support for the [entire GT-521F52 API](https://cdn.sparkfun.com/assets/learn_tutorials/7/2/3/GT-521F52_Programming_guide_V10_20161001.pdf)
 * SCSI-over-USB; so no adapter required.

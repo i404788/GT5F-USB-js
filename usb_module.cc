@@ -27,7 +27,7 @@ void sendrawdata(const Nan::FunctionCallbackInfo<v8::Value> &args)
         return;
     }
     unsigned char *buffer = (unsigned char *)node::Buffer::Data(args[0]);
-    int stat = Send_Data(currenthandle, buffer, args[0].As<v8::Uint8Array>()->Length(), args[1]->IsTrue());
+    int stat = sendData(currenthandle, buffer, args[0].As<v8::Uint8Array>()->Length(), args[1]->IsTrue());
 
     const unsigned argc = 1;
     v8::Local<v8::Value> argv[argc] = {Nan::New(stat)};
@@ -53,7 +53,7 @@ void receiverawdata(const Nan::FunctionCallbackInfo<v8::Value> &args)
 
     unsigned int size = (unsigned int)args[0]->NumberValue();
     unsigned char *retval = new unsigned char[size];
-    int stat = Receive_Data(currenthandle, retval, size);
+    int stat = receiveData(currenthandle, retval, size);
 
     const unsigned argc = 2;
     v8::Local<v8::Value> argv[argc] = {Nan::New(stat), Nan::NewBuffer((char *)retval, size).ToLocalChecked()};
@@ -83,7 +83,7 @@ void runcommand(const Nan::FunctionCallbackInfo<v8::Value> &args)
 
     int cmd_id = (unsigned short)args[0]->NumberValue();
     int parameter = (int)args[1]->NumberValue();
-    int stat = Run_Command(currenthandle, cmd_id, parameter);
+    int stat = runCommand(currenthandle, cmd_id, parameter);
 
     const unsigned argc = 1;
     v8::Local<v8::Value> argv[argc] = {Nan::New(stat)};
