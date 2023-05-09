@@ -1,5 +1,12 @@
-#include "usb_protoc.h"
+#include "usb_protoc.hpp"
 #include <nan.h>
+
+using v8::Context;
+using v8::Function;
+using v8::FunctionCallbackInfo;
+using v8::FunctionTemplate;
+using v8::Isolate;
+using v8::Local;
 
 int currenthandle = -1;
 
@@ -27,7 +34,7 @@ void sendrawdata(const Nan::FunctionCallbackInfo<v8::Value> &args)
         return;
     }
     unsigned char *buffer = (unsigned char *)node::Buffer::Data(args[0]);
-    int stat = sendData(currenthandle, buffer, args[0].As<v8::Uint8Array>()->Length(), args[1]->IsTrue());
+    int stat = sendRawData(currenthandle, buffer, args[0].As<v8::Uint8Array>()->Length(), args[1]->IsTrue());
 
     const unsigned argc = 1;
     v8::Local<v8::Value> argv[argc] = {Nan::New(stat)};
@@ -50,10 +57,13 @@ void receiverawdata(const Nan::FunctionCallbackInfo<v8::Value> &args)
         Nan::ThrowError("Argument must be a number");
         return;
     }
-
-    unsigned int size = (unsigned int)args[0]->NumberValue();
+    
+    Isolate* isolate = args.GetIsolate();
+    Local<Context> context = isolate->GetCurrentContext();
+    
+    unsigned int size = (unsigned int)args[0]->NumberValue(context).FromJust();
     unsigned char *retval = new unsigned char[size];
-    int stat = receiveData(currenthandle, retval, size);
+    int stat = receiveRawData(currenthandle, retval, size);
 
     const unsigned argc = 2;
     v8::Local<v8::Value> argv[argc] = {Nan::New(stat), Nan::NewBuffer((char *)retval, size).ToLocalChecked()};
@@ -81,9 +91,13 @@ void runcommand(const Nan::FunctionCallbackInfo<v8::Value> &args)
         return;
     }
 
-    int cmd_id = (unsigned short)args[0]->NumberValue();
-    int parameter = (int)args[1]->NumberValue();
-    int stat = runCommand(currenthandle, cmd_id, parameter);
+    Isolate* isolate = args.GetIsolate();
+    Local<Context> context = isolate->GetCurrentContext();
+
+    int cmd_id = (unsigned short)args[0]->NumberValue(context).FromJust();
+    int parameter = (int)args[1]->NumberValue(context).FromJust();
+    CmdPacket result;
+    int stat = runCommand(currenthandle, cmd_id, parameter, result);
 
     const unsigned argc = 1;
     v8::Local<v8::Value> argv[argc] = {Nan::New(stat)};
@@ -127,7 +141,7 @@ void initdevice(const Nan::FunctionCallbackInfo<v8::Value> &args)
     cb.Call(argc, argv, &resource);
 }
 
-void Init(v8::Local<v8::Object> exports, v8::Local<v8::Object> module)
+void Init(v8::Local<v8::Object> exports, v8::Local<v8::Value> module, void*)
 {
     Nan::SetMethod(exports, "initdevice", initdevice);
     Nan::SetMethod(exports, "receiverawdata", receiverawdata);
