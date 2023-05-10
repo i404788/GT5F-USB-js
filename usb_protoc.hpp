@@ -132,8 +132,9 @@ int32_t gethandle(const char *device) {
 
 int32_t sendRawData(int32_t fd, const uint8_t *data, size_t len, bool isCMD) {
   // TODO: Use data_packet as base?
-  uint8_t packet[len + 6] = {0, 0, 1, 0};
+  uint8_t packet[len + 6];
   *((uint16_t *)packet) = isCMD ? CmdHeader : DataHeader;
+  packet[2] = 1;
   memcpy(&packet[4], data, len);
   uint16_t crc = calc_crc(packet, len + 4);
   *((uint16_t *)&packet[len + 4]) = crc;
@@ -150,7 +151,7 @@ int32_t sendRawData(int32_t fd, const uint8_t *data, size_t len, bool isCMD) {
 }
 
 int32_t receiveRawData(int32_t fd, uint8_t *buf, size_t buf_size) {
-  uint8_t packet[buf_size + 6] = {0};
+  uint8_t packet[buf_size + 6];
 
   struct sg_io_hdr io_hdr;
   configure_io(&io_hdr, packet, buf_size + 6, true);
